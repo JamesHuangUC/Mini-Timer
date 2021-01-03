@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="script-src 'self' 'unsafe-inline'"
+    />
+    <title>Mini Timer | Simple timer and stopwatch</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <!-- <div><span id="time">00:00</span></div>
+    <button id="start">Start</button>
+    <button id="pause">Pause</button>
+    <button id="reset">Reset</button> -->
+
+    <div class="header-arrow"></div>
+
+    <div class="container">
+      <form id="count-down-form" novalidate>
+        <input type="number" id="hour" min="0" />
+        <label for="hour">Hours</label>
+
+        <div class="separator"></div>
+
+        <input type="number" id="minute" min="0" max="59" />
+        <label for="minute">Minutes</label>
+
+        <button type="submit">Start</button>
+      </form>
+    </div>
+  </body>
+
+  <script>
+    const { ipcRenderer } = require("electron");
+    const countDownForm = document.getElementById("count-down-form");
+
+    // Get settings
+    ipcRenderer.on("settings:get", (e, settings) => {
+      document.getElementById("minute").value = settings.minute;
+      document.getElementById("hour").value = settings.hour;
+    });
+
+    // Submit settings
+    countDownForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const minute = parseInt(document.getElementById("minute").value);
+      const hour = parseInt(document.getElementById("hour").value);
+
+      // Send new settings to main process
+      ipcRenderer.send("settings:set", {
+        minute,
+        hour,
+      });
+
+      if (!isNaN(minute) && !isNaN(hour) && minute >= 0 && hour >= 0) {
+        // Send new settings to main process
+        ipcRenderer.send("timer:countdown", {
+          minute,
+          hour,
+        });
+      }
+    });
+  </script>
+
+  <!-- <script>
+    let hr = (min = sec = 0);
+    let carry = 0;
+    let timer = null;
+
+    const timeSpan = document.getElementById("time");
+    document.getElementById("start").addEventListener("click", startTime);
+    document.getElementById("pause").addEventListener("click", pauseTime);
+    document.getElementById("reset").addEventListener("click", resetTime);
+
+    function startTime() {
+      const startTime = Date.now();
+      let curTime = startTime;
+
+      function formatTime(time) {
+        return Math.floor(time).toString().padStart(2, "0");
+      }
+
+      timer = setInterval(() => {
+        curTime = Date.now();
+        let elapsedSec = (carry + curTime - startTime) / 1000;
+        hr = formatTime((elapsedSec / 3600) % 60);
+        min = formatTime((elapsedSec / 60) % 60);
+        sec = formatTime(elapsedSec % 60);
+        timeSpan.textContent =
+          hr === "00" ? `${min}:${sec}` : `${hr}:${min}:${sec}`;
+      }, 1000);
+    }
+
+    function pauseTime() {
+      clearInterval(timer);
+      carry = (parseInt(hr) * 3600 + parseInt(min) * 60 + parseInt(sec)) * 1000;
+    }
+
+    function resetTime() {
+      clearInterval(timer);
+      carry = 0;
+      timeSpan.textContent = "00:00";
+    }
+  </script> -->
+</html>
