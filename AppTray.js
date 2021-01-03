@@ -1,5 +1,4 @@
-const { app, Menu, Tray } = require('electron');
-const path = require('path');
+const { app, Menu, Tray, Notification } = require('electron');
 
 class AppTray extends Tray {
   constructor(icon, mainWindow, aboutWindow) {
@@ -46,10 +45,8 @@ class AppTray extends Tray {
       {
         label: 'Minutes',
         submenu: [
-          {
-            label: '5 Minutes',
-            click: this.countDown.bind(this, 5 * 60),
-          },
+          { label: '1 Minute', click: this.countDown.bind(this, 1 * 60) },
+          { label: '5 Minutes', click: this.countDown.bind(this, 5 * 60) },
           { type: 'separator' },
           { label: '10 Minutes', click: this.countDown.bind(this, 10 * 60) },
           { label: '15 Minutes', click: this.countDown.bind(this, 15 * 60) },
@@ -268,10 +265,12 @@ class AppTray extends Tray {
       this.carry = elapsedSec;
 
       if (elapsedSec <= 0) {
-        this.carry = 0;
-        clearInterval(this.timer);
-        this.time = '00:00';
-        this.displayTime();
+        const notification = {
+          title: "Time's up!",
+          timeoutType: 'never',
+        };
+        new Notification(notification).show();
+        this.resetTime();
       }
 
       this.hr = this.formatTime((elapsedSec / 3600) % 24);
