@@ -2,6 +2,8 @@
 
 Simple timer and stopwatch electron app.
 
+Release Download: [Mini Timer.zip](https://github.com/JamesHuangUC/Mini-Timer/raw/main/Release/Mini%20Timer.zip)
+
 ### Install
 
 ```
